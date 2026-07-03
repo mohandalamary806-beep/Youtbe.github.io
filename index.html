@@ -1,0 +1,2968 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Video Analyzer</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg-1:#8f1626;
+--bg-2:#4c0e14;
+--bg-3:#2a0a0a;
+--panel:rgba(255,238,233,.06);
+--panel-2:rgba(255,238,233,.10);
+--border:rgba(233,76,86,.32);
+--text:#f5ece7;
+--muted:rgba(244,231,227,.72);
+--accent:#c41f2e;
+--accent-2:#e8483f;
+--accent-dark:#7a0f1a;
+--accent-soft:rgba(196,31,46,.24);
+--gold:#caa23f;
+--glass-shine:rgba(255,240,232,.5);
+--radius-lg:22px;
+--radius-md:14px;
+--radius-sm:10px;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Tajawal","Segoe UI",Arial,sans-serif;
+}
+
+body{
+background:
+radial-gradient(circle at 10% 10%,var(--bg-3),transparent 55%),
+radial-gradient(circle at 90% 15%,var(--bg-1),transparent 55%),
+radial-gradient(circle at 50% 100%,var(--bg-2),transparent 60%),
+linear-gradient(135deg,#0c0707,#170a0a 55%,#1b0b09);
+background-attachment:fixed;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+min-height:100vh;
+color:var(--text);
+padding:40px 16px;
+}
+
+.container{
+width:100%;
+max-width:650px;
+background:linear-gradient(180deg,var(--panel),var(--panel-2));
+backdrop-filter:blur(22px) saturate(160%);
+-webkit-backdrop-filter:blur(22px) saturate(160%);
+padding:32px;
+border-radius:var(--radius-lg);
+border:1.5px solid var(--border);
+box-shadow:
+0 25px 60px -15px rgba(10,4,4,.6),
+inset 0 1px 0 var(--glass-shine);
+animation:riseIn .5s ease both;
+}
+
+@keyframes riseIn{
+from{opacity:0;transform:translateY(14px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+h1{
+text-align:center;
+margin-bottom:28px;
+font-size:27px;
+font-weight:900;
+letter-spacing:.3px;
+text-shadow:0 2px 12px rgba(0,0,0,.4);
+background:linear-gradient(90deg,#fff,#e8c078,#fff);
+-webkit-background-clip:text;
+background-clip:text;
+}
+
+.section-label{
+display:flex;
+align-items:center;
+gap:10px;
+color:var(--text);
+font-size:13px;
+font-weight:700;
+margin:26px 0 10px;
+text-shadow:0 1px 6px rgba(0,0,0,.3);
+}
+
+.section-label::before,
+.section-label::after{
+content:"";
+flex:1;
+height:1px;
+background:linear-gradient(90deg,transparent,var(--border),transparent);
+}
+
+input{
+width:100%;
+padding:15px 16px;
+background:rgba(255,247,244,.95);
+border:1.5px solid transparent;
+color:#2e1214;
+border-radius:var(--radius-sm);
+margin-bottom:14px;
+font-size:15px;
+font-weight:500;
+outline:none;
+box-shadow:inset 0 1px 3px rgba(0,0,0,.18);
+transition:border-color .2s,box-shadow .2s,transform .15s;
+}
+
+input::placeholder{
+color:#a08484;
+}
+
+input:focus{
+border-color:var(--gold);
+box-shadow:0 0 0 4px rgba(202,162,63,.35);
+transform:translateY(-1px);
+}
+
+button{
+width:100%;
+padding:16px;
+background:linear-gradient(135deg,var(--accent-2),var(--accent) 55%,#4a0e16);
+background-size:180% 180%;
+color:white;
+font-size:16px;
+font-weight:800;
+letter-spacing:.2px;
+border:none;
+border-radius:var(--radius-sm);
+cursor:pointer;
+position:relative;
+overflow:hidden;
+transition:transform .15s,box-shadow .15s,background-position .4s;
+box-shadow:
+0 10px 25px -6px rgba(196,31,46,.55),
+inset 0 1px 0 rgba(255,240,232,.45);
+}
+
+button::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(120deg,transparent 30%,rgba(255,235,230,.4) 50%,transparent 70%);
+transform:translateX(-100%);
+transition:transform .5s;
+}
+
+button:hover:not(:disabled){
+background-position:100% 50%;
+transform:translateY(-2px);
+box-shadow:
+0 14px 30px -6px rgba(196,31,46,.65),
+inset 0 1px 0 rgba(255,240,232,.55);
+}
+
+button:hover:not(:disabled)::after{
+transform:translateX(100%);
+}
+
+button:active:not(:disabled){
+transform:translateY(0);
+}
+
+button:focus-visible,
+input:focus-visible{
+outline:2px solid var(--gold);
+outline-offset:2px;
+}
+
+button:disabled{
+background:rgba(255,240,232,.15);
+color:rgba(244,231,227,.45);
+cursor:not-allowed;
+box-shadow:none;
+}
+
+.card{
+display:none;
+margin-top:8px;
+background:linear-gradient(180deg,var(--panel),var(--panel-2));
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+border:1px solid var(--border);
+padding:22px;
+border-radius:var(--radius-md);
+box-shadow:inset 0 1px 0 var(--glass-shine);
+animation:riseIn .4s ease both;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:0;
+padding:12px 0;
+font-size:15px;
+gap:14px;
+border-bottom:1px solid var(--border);
+}
+
+.row:last-child{
+border-bottom:none;
+}
+
+.row b{
+color:var(--muted);
+font-weight:500;
+white-space:nowrap;
+}
+
+.row span{
+text-align:left;
+font-weight:700;
+color:var(--text);
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+
+img{
+width:100%;
+display:block;
+border-radius:var(--radius-md);
+margin-bottom:18px;
+border:1.5px solid var(--border);
+box-shadow:0 8px 20px -8px rgba(0,0,0,.5);
+}
+
+.comments-section{
+margin-top:28px;
+}
+
+.comments-section h2{
+margin-bottom:16px;
+font-size:18px;
+font-weight:700;
+color:var(--text);
+border-bottom:1px solid var(--border);
+padding-bottom:12px;
+}
+
+.comment-item{
+background:linear-gradient(180deg,var(--panel),var(--panel-2));
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+border:1px solid var(--border);
+padding:15px;
+border-radius:var(--radius-md);
+margin-bottom:12px;
+display:flex;
+gap:12px;
+align-items:flex-start;
+}
+
+.comment-rank{
+background:linear-gradient(135deg,var(--accent-2),var(--accent));
+color:white;
+min-width:28px;
+height:28px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+font-size:14px;
+flex-shrink:0;
+box-shadow:0 3px 8px -2px rgba(196,31,46,.6);
+}
+
+.comment-body{
+flex:1;
+min-width:0;
+}
+
+.comment-author{
+font-weight:700;
+color:#f2a89c;
+margin-bottom:5px;
+font-size:15px;
+}
+
+.comment-text{
+color:var(--text);
+font-size:14px;
+line-height:1.6;
+margin-bottom:8px;
+word-wrap:break-word;
+}
+
+.comment-likes{
+color:var(--muted);
+font-size:13px;
+display:flex;
+align-items:center;
+gap:5px;
+}
+
+.loading-text{
+text-align:center;
+color:var(--muted);
+padding:20px;
+}
+
+.no-comments{
+text-align:center;
+color:var(--text);
+padding:16px;
+background:var(--panel);
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+}
+
+.progress-wrap{
+text-align:center;
+padding:22px;
+color:var(--muted);
+font-size:14px;
+}
+
+.progress-bar{
+width:100%;
+height:8px;
+background:rgba(0,0,0,.3);
+border-radius:4px;
+overflow:hidden;
+margin-top:12px;
+}
+
+.progress-fill{
+height:100%;
+background:linear-gradient(90deg,var(--gold),var(--accent-2),var(--accent));
+transition:width .2s;
+width:0%;
+}
+
+.winner-card{
+position:relative;
+background:linear-gradient(135deg,#f0cf7a,var(--gold) 45%,#a9762a);
+padding:22px;
+border-radius:var(--radius-md);
+margin-bottom:20px;
+text-align:center;
+color:#3d2607;
+box-shadow:
+0 12px 30px -8px rgba(202,162,63,.45),
+inset 0 1px 0 rgba(255,245,225,.6);
+overflow:hidden;
+}
+
+.winner-card::before{
+content:"🏆";
+position:absolute;
+font-size:80px;
+opacity:.18;
+top:-18px;
+left:-10px;
+transform:rotate(-15deg);
+}
+
+.winner-label{
+font-size:13px;
+font-weight:700;
+letter-spacing:.3px;
+opacity:.85;
+margin-bottom:8px;
+}
+
+.winner-name{
+font-size:24px;
+font-weight:900;
+margin-bottom:10px;
+word-wrap:break-word;
+}
+
+.winner-count{
+font-size:15px;
+font-weight:700;
+color:#fff;
+background:rgba(0,0,0,.35);
+display:inline-block;
+padding:7px 18px;
+border-radius:20px;
+}
+
+.winner-name a{
+color:inherit;
+text-decoration:none;
+border-bottom:2px solid rgba(61,38,7,.4);
+}
+
+.ranking-item{
+background:linear-gradient(180deg,var(--panel),var(--panel-2));
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+border:1px solid var(--border);
+padding:12px 15px;
+border-radius:var(--radius-md);
+margin-bottom:10px;
+display:flex;
+align-items:center;
+gap:12px;
+transition:border-color .15s,transform .15s;
+}
+
+.ranking-item:hover{
+border-color:var(--gold);
+transform:translateX(-2px);
+}
+
+.ranking-rank{
+background:rgba(255,235,230,.2);
+color:white;
+min-width:26px;
+height:26px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+font-size:13px;
+flex-shrink:0;
+}
+
+.ranking-item.rank-gold .ranking-rank{background:linear-gradient(135deg,#eec97a,#b8842a);color:#331f06}
+.ranking-item.rank-silver .ranking-rank{background:linear-gradient(135deg,#dce3ea,#aab4c2);color:#242e3b}
+.ranking-item.rank-bronze .ranking-rank{background:linear-gradient(135deg,#d08a52,#8a3d0f);color:#fff}
+
+.ranking-name{
+flex:1;
+font-size:15px;
+color:var(--text);
+min-width:0;
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+
+.ranking-name a{
+color:inherit;
+text-decoration:none;
+}
+
+.ranking-name a:hover{
+text-decoration:underline;
+}
+
+.ranking-count{
+color:var(--gold);
+font-weight:bold;
+font-size:14px;
+white-space:nowrap;
+}
+
+/* ===== قسم مشتركين القناة (إضافة جديدة) ===== */
+.channel-card{
+display:none;
+margin-top:8px;
+background:linear-gradient(180deg,var(--panel),var(--panel-2));
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+border:1px solid var(--border);
+padding:22px;
+border-radius:var(--radius-md);
+text-align:center;
+box-shadow:inset 0 1px 0 var(--glass-shine);
+animation:riseIn .4s ease both;
+}
+
+.channel-thumb{
+width:88px;
+height:88px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid var(--gold);
+box-shadow:0 6px 18px -4px rgba(0,0,0,.5);
+margin-bottom:14px;
+}
+
+.channel-name{
+font-size:19px;
+font-weight:900;
+color:var(--text);
+margin-bottom:4px;
+}
+
+.channel-name a{
+color:inherit;
+text-decoration:none;
+}
+
+.channel-name a:hover{
+text-decoration:underline;
+}
+
+.channel-handle{
+color:var(--muted);
+font-size:13px;
+margin-bottom:18px;
+}
+
+.channel-stats{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.channel-stat{
+flex:1;
+min-width:110px;
+background:rgba(0,0,0,.28);
+border:1px solid var(--border);
+border-radius:var(--radius-sm);
+padding:14px 10px;
+}
+
+.channel-stat-value{
+font-size:20px;
+font-weight:900;
+color:var(--gold);
+text-shadow:0 1px 4px rgba(0,0,0,.4);
+margin-bottom:4px;
+}
+
+.channel-stat-label{
+font-size:12px;
+color:var(--muted);
+}
+
+/* ======================================================
+   الجزء ده كله إضافة جديدة - مفيش أي سطر اتغير أو اتحذف
+   من الاستايل الأصلي اللي فوق. اللي هنا بس:
+   1) زرار تبديل الوضع الداكن/الفاتح
+   2) وضع فاتح مريح للعين (يستخدم نفس متغيرات الألوان)
+   3) زرار نسخ إعلان الفايز
+   ====================================================== */
+
+.theme-toggle-btn{
+position:fixed;
+top:18px;
+left:18px;
+width:52px;
+height:52px;
+border-radius:50%;
+border:1.5px solid var(--border);
+background:linear-gradient(135deg,var(--panel-2),var(--panel));
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+box-shadow:0 8px 20px -6px rgba(0,0,0,.5),inset 0 1px 0 var(--glass-shine);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+line-height:1;
+cursor:pointer;
+z-index:999;
+padding:0;
+transition:transform .3s ease,box-shadow .2s ease,background .45s ease,border-color .45s ease;
+}
+
+.theme-toggle-btn:hover{
+transform:translateY(-2px) rotate(12deg);
+box-shadow:0 12px 26px -6px rgba(0,0,0,.6),inset 0 1px 0 var(--glass-shine);
+}
+
+.theme-toggle-btn:active{
+transform:translateY(0) rotate(0deg);
+}
+
+.theme-toggle-btn:focus-visible{
+outline:2px solid var(--gold);
+outline-offset:3px;
+}
+
+/* ترانزيشن ناعم وقت التبديل بين الوضعين */
+body,
+.container,
+.card,
+.channel-card,
+.comment-item,
+.ranking-item,
+.no-comments,
+input{
+transition:background .45s ease,background-color .45s ease,color .45s ease,border-color .45s ease,box-shadow .45s ease;
+}
+
+/* وضع فاتح مريح للعين - ألوان باستيل هادية بدل الألوان الصارخة،
+   مع نفس هوية البنفسجي/الوردي بتاعة الموقع لكن بشكل أخف */
+body.light-mode{
+--bg-1:#f7dcdb;
+--bg-2:#f3e4d9;
+--bg-3:#f0d6ce;
+--panel:rgba(255,255,255,.62);
+--panel-2:rgba(255,255,255,.85);
+--border:rgba(196,40,50,.18);
+--text:#3a1416;
+--muted:#8c6a68;
+--gold:#8a5518;
+--glass-shine:rgba(255,255,255,.9);
+background:
+radial-gradient(circle at 10% 10%,var(--bg-3),transparent 55%),
+radial-gradient(circle at 90% 15%,var(--bg-1),transparent 55%),
+radial-gradient(circle at 50% 100%,var(--bg-2),transparent 60%),
+linear-gradient(135deg,#fdf6f5,#fbf1ee 55%,#fbf3ec);
+}
+
+/* لون اسم صاحب الكومنت كان فاتح جدًا وهيبقى صعب يتقرا على الخلفية
+   الفاتحة، فبنغيره هنا بس في وضع النهار عشان يفضل واضح ومريح */
+body.light-mode .comment-author{
+color:var(--accent-dark);
+}
+
+/* كارت الفايز بيستخدم var(--gold) كخلفية، وعشان الدرجة الغامقة
+   الجديدة بتاعة gold مخصصة للنصوص، بنرجّع اللون الذهبي اللامع
+   الأصلي هنا بس عشان الكارت يفضل شكله مبهر */
+body.light-mode .winner-card{
+background:linear-gradient(135deg,#f0cf7a,#caa23f 45%,#a9762a);
+}
+
+/* حدود خفيفة للانبوت في الوضع الفاتح عشان يبان واضح فوق الخلفية الفاتحة */
+body.light-mode input{
+border:1.5px solid rgba(196,40,50,.2);
+}
+
+.copy-winner-btn{
+display:inline-flex;
+align-items:center;
+gap:6px;
+margin-top:12px;
+padding:9px 18px;
+background:rgba(0,0,0,.32);
+color:#fff;
+border:1px solid rgba(255,235,230,.35);
+border-radius:20px;
+font-size:13px;
+font-weight:700;
+cursor:pointer;
+transition:background .2s ease,transform .15s ease;
+}
+
+.copy-winner-btn:hover{
+background:rgba(0,0,0,.45);
+transform:translateY(-1px);
+}
+
+.copy-winner-btn:active{
+transform:translateY(0);
+}
+
+/* ======================================================
+   من هنا لحد آخر ملف الـ CSS: إضافات جديدة بس (مرحلة 2).
+   ولا سطر واحد اتغير أو اتحذف من أي استايل فوق ده - سواء
+   الأصلي أو الإضافات اللي كانت موجودة قبل كده. اللي هنا بس:
+   1) الزرار الدائري الثابت اللي بيودي على قناة اليوتيوب
+   2) زرار "مشاهدة الفيديو على يوتيوب" جوه كارت النتيجة
+   3) صف أزرار نسخ/تحميل الترتيب الكامل للمعلقين (مش بس أول 10)
+   ====================================================== */
+
+.youtube-fab-btn{
+position:fixed;
+top:18px;
+right:18px;
+width:52px;
+height:52px;
+border-radius:50%;
+border:1.5px solid var(--border);
+background:linear-gradient(135deg,var(--panel-2),var(--panel));
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+box-shadow:0 8px 20px -6px rgba(0,0,0,.5),inset 0 1px 0 var(--glass-shine);
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+z-index:999;
+padding:0;
+text-decoration:none;
+transition:transform .3s ease,box-shadow .2s ease;
+}
+
+.youtube-fab-btn svg{
+width:26px;
+height:26px;
+display:block;
+}
+
+.youtube-fab-btn:hover{
+transform:translateY(-2px) scale(1.06);
+box-shadow:0 12px 26px -6px rgba(0,0,0,.6),inset 0 1px 0 var(--glass-shine);
+}
+
+.youtube-fab-btn:active{
+transform:translateY(0) scale(1);
+}
+
+.youtube-fab-btn:focus-visible{
+outline:2px solid var(--gold);
+outline-offset:3px;
+}
+
+.watch-video-btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+width:100%;
+margin-top:16px;
+padding:14px;
+background:linear-gradient(135deg,#e8483f,#c41f2e 60%,#7a0f1a);
+background-size:180% 180%;
+color:#fff;
+font-size:15px;
+font-weight:800;
+text-decoration:none;
+border-radius:var(--radius-sm);
+box-shadow:0 10px 22px -8px rgba(196,31,46,.6),inset 0 1px 0 rgba(255,235,230,.3);
+transition:transform .15s,box-shadow .15s,background-position .4s;
+}
+
+.watch-video-btn:hover{
+transform:translateY(-2px);
+background-position:100% 50%;
+box-shadow:0 14px 26px -8px rgba(196,31,46,.7),inset 0 1px 0 rgba(255,235,230,.35);
+}
+
+.watch-video-btn:active{
+transform:translateY(0);
+}
+
+.watch-video-btn:focus-visible{
+outline:2px solid var(--gold);
+outline-offset:3px;
+}
+
+.ranking-actions{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+margin-top:16px;
+}
+
+.ranking-actions .copy-winner-btn{
+margin-top:0;
+}
+
+/* ======================================================
+   من هنا لحد آخر ملف الـ CSS: إضافات جديدة تانية (مرحلة 3).
+   ولا سطر واحد اتغير أو اتحذف من أي استايل فوق ده - سواء
+   الأصلي أو الإضافات اللي كانت موجودة قبل كده. الجزء ده بيضيف استايل لـ:
+   1) صف أزرار "نسخ رابط الفيديو/القناة" + "إظهار الوصف"
+   2) صندوق عرض الوصف (فيديو/قناة) مع روابط قابلة للنقر جواه
+   3) صندوق البحث عن معلق معين في الترتيب الكامل
+   4) زرار تحميل الترتيب الكامل بصيغة CSV
+   ====================================================== */
+
+.desc-toggle-row{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+margin-top:12px;
+}
+
+.desc-toggle-row .copy-winner-btn{
+margin-top:0;
+}
+
+.desc-box{
+display:none;
+margin-top:12px;
+background:rgba(0,0,0,.22);
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+padding:16px;
+font-size:14px;
+line-height:1.8;
+color:var(--text);
+white-space:pre-wrap;
+word-wrap:break-word;
+max-height:280px;
+overflow-y:auto;
+text-align:right;
+}
+
+.desc-box a{
+color:var(--gold);
+text-decoration:underline;
+word-break:break-all;
+}
+
+.desc-box:empty::before{
+content:"مفيش وصف لعرضه";
+color:var(--muted);
+}
+
+body.light-mode .desc-box{
+background:rgba(0,0,0,.05);
+}
+
+.ranking-search-wrap{
+display:none;
+margin-top:16px;
+background:var(--panel);
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+padding:16px;
+}
+
+.ranking-search-row{
+display:flex;
+gap:10px;
+}
+
+.ranking-search-row input{
+margin-bottom:0;
+flex:1;
+}
+
+.ranking-search-row button{
+width:auto;
+flex-shrink:0;
+padding:0 22px;
+}
+
+.ranking-search-results{
+margin-top:14px;
+}
+
+.ranking-search-note{
+text-align:center;
+color:var(--muted);
+font-size:13px;
+margin-top:10px;
+}
+
+/* ======================================================
+   من هنا لحد آخر ملف الـ CSS: إضافات جديدة بس (مرحلة 4).
+   ولا سطر واحد اتغير أو اتحذف من أي استايل فوق ده - سواء الأصلي أو
+   أي إضافة قبل كده (مرحلة 1 أو 2 أو 3). استايل حقل "رابط إضافي"
+   القديم اتشال هو كمان من غير ما يأثر على أي حاجة تانية (أصلاً ما
+   كانش ليه أي استايل خاص بيه، كان بيستخدم استايل input العادي بس).
+   الجزء ده بيضيف استايل لـ:
+   1) سجل "آخر عمليات التحليل"
+   2) تحلیل نشاط التعليقات حسب الساعة (كارتات الملخص + الرسم البياني)
+   ====================================================== */
+
+.history-section{
+margin-top:18px;
+margin-bottom:6px;
+}
+
+.history-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+margin-bottom:10px;
+}
+
+.history-header span{
+font-size:13px;
+font-weight:700;
+color:var(--muted);
+}
+
+.history-clear-btn{
+width:auto;
+background:transparent;
+border:none;
+box-shadow:none;
+color:var(--muted);
+font-size:12px;
+font-weight:500;
+text-decoration:underline;
+cursor:pointer;
+padding:4px 2px;
+}
+
+.history-clear-btn:hover{
+color:var(--text);
+}
+
+.history-list{
+display:flex;
+flex-direction:column;
+gap:8px;
+max-height:280px;
+overflow-y:auto;
+}
+
+.history-item{
+display:flex;
+align-items:center;
+gap:12px;
+background:linear-gradient(180deg,var(--panel),var(--panel-2));
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+padding:8px 10px;
+cursor:pointer;
+transition:border-color .15s,transform .15s;
+}
+
+.history-item:hover{
+border-color:var(--gold);
+transform:translateX(-2px);
+}
+
+.history-thumb{
+width:64px;
+height:36px;
+min-width:64px;
+object-fit:cover;
+border-radius:6px;
+margin-bottom:0;
+border:1px solid var(--border);
+box-shadow:none;
+}
+
+.history-info{
+flex:1;
+min-width:0;
+}
+
+.history-title{
+font-size:13px;
+font-weight:700;
+color:var(--text);
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.history-meta{
+font-size:11px;
+color:var(--muted);
+margin-top:2px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.hourly-activity-section{
+margin-top:28px;
+}
+
+.hourly-activity-section h2{
+margin-bottom:16px;
+font-size:18px;
+font-weight:700;
+color:var(--text);
+border-bottom:1px solid var(--border);
+padding-bottom:12px;
+}
+
+.hourly-activity-stats{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
+margin-bottom:16px;
+}
+
+.hourly-chart{
+display:flex;
+align-items:flex-end;
+gap:3px;
+height:150px;
+padding:10px 8px 0;
+background:rgba(0,0,0,.18);
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+}
+
+body.light-mode .hourly-chart{
+background:rgba(0,0,0,.05);
+}
+
+.hourly-bar-col{
+flex:1;
+min-width:0;
+height:100%;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:flex-end;
+}
+
+.hourly-bar{
+width:100%;
+min-height:2px;
+background:linear-gradient(180deg,var(--accent-2),var(--accent));
+border-radius:3px 3px 0 0;
+transition:height .5s ease;
+}
+
+.hourly-bar-peak{
+background:linear-gradient(180deg,#f0cf7a,var(--gold));
+}
+
+.hourly-bar-label{
+font-size:9px;
+color:var(--muted);
+margin-top:5px;
+}
+
+/* ======================================================
+   إضافة واجهة التعليمات والترحيب (مرحلة أحدث):
+   تصميم زجاجي شفاف ومطابق تماماً مع تأثير البلور للموقع بالكامل
+   ====================================================== */
+.welcome-overlay {
+position:fixed;
+inset:0;
+background:rgba(12,7,7,.75);
+backdrop-filter:blur(14px) saturate(140%);
+-webkit-backdrop-filter:blur(14px) saturate(140%);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:10000;
+padding:16px;
+transition:opacity .4s ease,visibility .4s ease;
+}
+
+.welcome-modal {
+background:linear-gradient(180deg,rgba(255,238,233,.08),rgba(255,238,233,.15));
+backdrop-filter:blur(24px);
+-webkit-backdrop-filter:blur(24px);
+border:2px solid rgba(233,76,86,.4);
+border-radius:var(--radius-lg);
+padding:28px;
+max-width:500px;
+width:100%;
+color:var(--text);
+box-shadow:0 30px 70px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,240,232,.3);
+text-align:right;
+animation:modalRise .5s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+
+@keyframes modalRise {
+from{opacity:0;transform:translateY(30px) scale(0.95)}
+to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.welcome-modal h2 {
+font-size:22px;
+font-weight:900;
+margin-bottom:16px;
+background:linear-gradient(90deg,#fff,#e8c078,#fff);
+-webkit-background-clip:text;
+background-clip:text;
+color:transparent;
+text-align:center;
+}
+
+.welcome-modal p {
+font-size:14px;
+color:var(--muted);
+margin-bottom:14px;
+line-height:1.6;
+}
+
+.welcome-modal ul {
+list-style:none;
+padding:0;
+margin-bottom:22px;
+}
+
+.welcome-modal li {
+font-size:14px;
+line-height:1.7;
+margin-bottom:10px;
+position:relative;
+padding-right:22px;
+color:var(--text);
+}
+
+.welcome-modal li::before {
+content:"✦";
+position:absolute;
+right:0;
+color:var(--gold);
+font-weight:bold;
+}
+
+.welcome-btn {
+width:100%;
+padding:15px;
+background:linear-gradient(135deg,var(--accent-2),var(--accent) 65%);
+color:white;
+font-size:15px;
+font-weight:800;
+border:none;
+border-radius:var(--radius-sm);
+cursor:pointer;
+box-shadow:0 8px 20px rgba(196,31,46,.4);
+transition:transform .2s,box-shadow .2s;
+}
+
+.welcome-btn:hover {
+transform:translateY(-2px);
+box-shadow:0 12px 24px rgba(196,31,46,.5);
+}
+
+.welcome-btn:active {
+transform:translateY(0);
+}
+
+body.light-mode .welcome-overlay {
+background:rgba(240,214,206,.65);
+}
+
+body.light-mode .welcome-modal {
+background:rgba(255,255,255,.9);
+border:2px solid rgba(196,40,50,.25);
+color:#3a1416;
+box-shadow:0 20px 50px rgba(0,0,0,.15);
+}
+
+body.light-mode .welcome-modal h2 {
+background:linear-gradient(90deg,#3a1416,#8a5518,#3a1416);
+-webkit-background-clip:text;
+background-clip:text;
+}
+</style>
+</head>
+<body>
+
+<!-- واجهة التعليمات والترحيب الجديدة -->
+<div id="welcomeOverlay" class="welcome-overlay">
+<div class="welcome-modal">
+<h2>👋 مرحبًا بك في محلل اليوتيوب!</h2>
+<p>إليك دليل سريع ومختصر لكيفية تحقيق أقصى استفادة من الموقع:</p>
+<ul>
+<li><strong>تحليل الفيديوهات:</strong> ضع رابط أي فيديو يوتيوب في الحقل المخصص، ثم اضغط "تحليل الفيديو" لمعرفة الإحصائيات الشاملة والترتيب الكامل لأكثر المعلقين تفاعلاً.</li>
+<li><strong>بيانات القنوات:</strong> ضع رابط القناة أو معرفها المسبوق بـ (@) واضغط "عرض بيانات القناة" لمعرفة عدد المشتركين وعمر القناة التقريبي.</li>
+<li><strong>مزايا ذكية:</strong> يمكنك تبديل وضع الإضاءة من زر الهلال الجانبي، والبحث عن معلقين بالاسم، أو تحميل ترتيب المعلقين الكامل بصيغة ملف CSV أو نصي.</li>
+</ul>
+<button id="closeWelcomeBtn" class="welcome-btn" type="button">جاهز، فلنبدأ! 🚀</button>
+</div>
+</div>
+
+<button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-label="تفعيل الوضع الفاتح" title="تبديل الوضع الداكن/الفاتح">
+<span id="themeToggleIcon">🌙</span>
+</button>
+
+<!-- ============================================================
+     إضافة جديدة: زرار ثابت بعلامة يوتيوب بيودي على القناة بتاعتنا
+     في تاب جديد. مفيش أي تعديل في الزرار اللي فوق ده أو أي حاجة تانية.
+     ============================================================ -->
+<a id="youtubeChannelBtn" class="youtube-fab-btn" href="https://www.youtube.com/channel/UCLK7_lGEgTg_n7Qf6kWqBKw" target="_blank" rel="noopener noreferrer" aria-label="زور قناتنا على يوتيوب" title="زور قناتنا على يوتيوب">
+<svg viewBox="0 0 48 34" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<rect x="0" y="0" width="48" height="34" rx="10" fill="#FF0000"></rect>
+<polygon points="19,10 19,24 32,17" fill="#ffffff"></polygon>
+</svg>
+</a>
+
+<div class="container">
+
+<h1>📺 تحليل فيديو يوتيوب</h1>
+
+<input id="videoUrl" placeholder="ضع رابط الفيديو هنا">
+
+<button id="analyzeBtn" onclick="analyze()">
+تحليل الفيديو
+</button>
+
+<!-- ============================================================
+     إضافة جديدة (مرحلة 4): سجل "آخر عمليات التحليل". بيظهر بس لو
+     فيه فيديوهات اتحللت قبل كده (محفوظة في localStorage بتاع
+     المتصفح)، وبيدي إمكانية إعادة عرض أي فيديو منهم بضغطة واحدة من
+     غير ما تحتاج تلصق الرابط تاني. الجافاسكريبت بتاعه في آخر الملف،
+     وبيتملى/يتحدث لوحده من غير أي تعديل على دالة analyze() الأصلية.
+     ============================================================ -->
+<div class="history-section" id="historySection" style="display:none">
+<div class="history-header">
+<span>🕘 آخر 10 فيديوهات حللتها</span>
+<button type="button" id="clearHistoryBtn" class="history-clear-btn">مسح السجل</button>
+</div>
+<div class="history-list" id="historyList"></div>
+</div>
+
+<div class="card" id="result">
+
+<img id="thumb">
+
+<div class="row">
+<b>العنوان</b>
+<span id="title">...</span>
+</div>
+
+<div class="row">
+<b>القناة</b>
+<span id="channel">...</span>
+</div>
+
+<div class="row">
+<b>المشاهدات</b>
+<span id="views">...</span>
+</div>
+
+<div class="row">
+<b>الإعجابات</b>
+<span id="likes">...</span>
+</div>
+
+<div class="row">
+<b>التعليقات</b>
+<span id="comments">...</span>
+</div>
+
+<!-- ============================================================
+     إضافة جديدة: صفين بيانات إضافية (تاريخ النشر + معدل التفاعل)
+     وزرار مشاهدة الفيديو على يوتيوب مباشرة. الصفوف دي بتتملى من
+     الجافاسكريبت الجديد تحت من غير ما تلمس دالة analyze() الأصلية.
+     ============================================================ -->
+<div class="row" id="publishedRow" style="display:none">
+<b>تاريخ النشر</b>
+<span id="publishedDate">...</span>
+</div>
+
+<div class="row" id="engagementRow" style="display:none">
+<b>معدل التفاعل</b>
+<span id="engagementRate">...</span>
+</div>
+
+<a id="watchVideoBtn" class="watch-video-btn" href="#" target="_blank" rel="noopener noreferrer" style="display:none">
+▶️ مشاهدة الفيديو على يوتيوب
+</a>
+
+<!-- ============================================================
+     إضافة جديدة (مرحلة 3): زرار نسخ رابط الفيديو + زرار إظهار/إخفاء
+     وصف الفيديو (بيحول أي رابط جوه الوصف لرابط قابل للنقر تلقائي).
+     البيانات دي كلها موجودة أصلاً في نفس رد الـ API اللي analyze()
+     بتجيبه - صفر طلبات إضافية على الـ quota بتاعك. مفيش أي تعديل
+     على analyze() ولا على أي عنصر HTML موجود فوق ده.
+     ============================================================ -->
+<div class="desc-toggle-row" id="videoExtraActions" style="display:none">
+<button type="button" class="copy-winner-btn" id="copyVideoLinkBtn">🔗 نسخ رابط الفيديو</button>
+<button type="button" class="copy-winner-btn" id="videoDescToggleBtn">📝 إظهار وصف الفيديو</button>
+</div>
+<div class="desc-box" id="videoDescBox"></div>
+
+</div>
+
+<div class="comments-section" id="commentsSection" style="display:none">
+<h2>🏆 أكتر شخص كتب كومنتات</h2>
+<div id="commentsList"></div>
+
+<!-- ============================================================
+     إضافة جديدة: صف زرارين لنسخ/تحميل الترتيب الكامل لكل المعلقين
+     (مش بس أول 10 اللي بيظهروا فوق). بيتحط برا #commentsList عشان
+     ما يتمسحش كل ما فيديو جديد يتحلل (لأن innerHTML بتاعه بيتصفر
+     في أول كل تحليل جديد).
+     ============================================================ -->
+<div class="ranking-actions" id="rankingActions" style="display:none">
+<button type="button" class="copy-winner-btn" id="copyFullRankingBtn">📋 نسخ الترتيب الكامل</button>
+<button type="button" class="copy-winner-btn" id="downloadFullRankingBtn">⬇️ تحميل الترتيب الكامل</button>
+<!-- إضافة جديدة (مرحلة 3): تحميل نفس الترتيب الكامل بصيغة CSV عشان يسهل فتحه في Excel / Google Sheets -->
+<button type="button" class="copy-winner-btn" id="downloadFullRankingCsvBtn">📊 تحميل CSV</button>
+</div>
+
+<!-- ============================================================
+     إضافة جديدة (مرحلة 3): مربع بحث عن معلق معين بالاسم جوه الترتيب
+     الكامل (مش بس أول 10 الظاهرين فوق). بيستخدم نفس المتغير
+     window.__lastFullRanking المحفوظ أصلاً - من غير أي تعديل في
+     buildCommenterRanking أو fetchTopComments الأصليين.
+     ============================================================ -->
+<div class="ranking-search-wrap" id="rankingSearchWrap">
+<div class="ranking-search-row">
+<input id="rankingSearchInput" placeholder="🔍 دور عن اسم معلق في الترتيب الكامل">
+<button type="button" class="copy-winner-btn" id="rankingSearchBtn">بحث</button>
+</div>
+<div class="ranking-search-results" id="rankingSearchResults"></div>
+</div>
+
+<!-- ============================================================
+     إضافة جديدة (مرحلة 4): تحليل نشاط التعليقات حسب الساعة - بيوضح
+     عدد التعليقات في كل ساعة من اليوم وأكتر ساعة فيها تعليقات، مع
+     رسم بياني (Bar Chart) بسيط بالـ CSS من غير أي مكتبة خارجية.
+     البيانات دي بتتجمع من نفس طلبات commentThreads اللي
+     fetchAllTopLevelComments أصلاً بتعملها لبناء الترتيب - يعني صفر
+     طلبات API إضافية وصفر استهلاك زيادة في الـ quota. الجافاسكريبت
+     بتاعه في آخر الملف ومش بيلمس fetchAllTopLevelComments ولا أي
+     دالة قديمة تانية خالص.
+     ============================================================ -->
+<div class="hourly-activity-section" id="hourlyActivitySection" style="display:none">
+<h2>🕓 نشاط التعليقات حسب الساعة</h2>
+<div class="hourly-activity-stats" id="hourlyActivityStats"></div>
+<div class="hourly-chart" id="hourlyChart" dir="ltr"></div>
+</div>
+
+</div>
+
+<!-- ============================================================
+     إضافة جديدة: قائمة "أعلى كومنت جاب لايكات" - قائمة تانية جنب
+     قائمة "أكتر شخص كتب كومنتات" اللي فوق، لكن هنا كل تعليق بيترتب
+     لوحده حسب عدد اللايكات اللي جابها (مش حسب عدد كومنتات صاحبه).
+     البيانات دي بتتجمع من نفس ردود commentThreads API اللي
+     fetchAllTopLevelComments أصلاً بتجيبها لبناء ترتيب المعلقين -
+     يعني صفر طلبات إضافية على الـ quota. الجافاسكريبت بتاعها في
+     آخر الملف ومش بيعدّل في fetchAllTopLevelComments ولا
+     buildCommenterRanking ولا fetchTopComments الأصليين خالص.
+     ============================================================ -->
+<div class="comments-section" id="topLikedCommentsSection" style="display:none">
+<h2>👍 أعلى كومنت جاب لايكات</h2>
+<div id="topLikedCommentsList"></div>
+</div>
+
+<div class="section-label">بيانات القناة</div>
+
+<input id="channelUrl" placeholder="ضع رابط القناة هنا">
+
+<button id="channelBtn" onclick="analyzeChannel()">
+عرض بيانات القناة
+</button>
+
+<div class="channel-card" id="channelResult">
+<img id="channelThumb" class="channel-thumb">
+<div class="channel-name" id="channelName">...</div>
+<div class="channel-handle" id="channelHandle"></div>
+<div class="channel-stats">
+<div class="channel-stat">
+<div class="channel-stat-value" id="channelSubs">...</div>
+<div class="channel-stat-label">مشترك</div>
+</div>
+<div class="channel-stat">
+<div class="channel-stat-value" id="channelVideos">...</div>
+<div class="channel-stat-label">فيديو</div>
+</div>
+<div class="channel-stat">
+<div class="channel-stat-value" id="channelViews">...</div>
+<div class="channel-stat-label">مشاهدة</div>
+</div>
+
+<!-- إضافة جديدة: 2 تايل جداد لمتوسط المشاهدات وعمر القناة -->
+<div class="channel-stat">
+<div class="channel-stat-value" id="channelAvgViews">...</div>
+<div class="channel-stat-label">متوسط مشاهدات/فيديو</div>
+</div>
+<div class="channel-stat">
+<div class="channel-stat-value" id="channelAge">...</div>
+<div class="channel-stat-label">عمر القناة</div>
+</div>
+</div>
+
+<!-- ============================================================
+     إضافة جديدة (مرحلة 3): نفس الفكرة بالظبط لكارت القناة - زرار
+     نسخ رابط القناة + زرار إظهار/إخفاء وصف القناة مع تحويل أي رابط
+     جواه لرابط قابل للنقر. من نفس رد الـ API اللي analyzeChannel()
+     بتجيبه أصلاً - صفر طلبات إضافية على الـ quota.
+     ============================================================ -->
+<div class="desc-toggle-row" id="channelExtraActions" style="display:none">
+<button type="button" class="copy-winner-btn" id="copyChannelLinkBtn">🔗 نسخ رابط القناة</button>
+<button type="button" class="copy-winner-btn" id="channelDescToggleBtn">📝 إظهار وصف القناة</button>
+</div>
+<div class="desc-box" id="channelDescBox"></div>
+
+</div>
+
+</div>
+
+<script>
+
+// تنبيه: لازم تحط قيود (HTTP referrer restrictions) على المفتاح ده من Google Cloud Console
+// عشان محدش غيرك يقدر يستخدمه من موقع تاني
+const API_KEY="AIzaSyC7EYdCk7gvlKypWCnK13ZldGIdyQHGvI0";
+
+function getVideoId(url) {
+    const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+
+    if (match) {
+        return match[1];
+    }
+
+    return null;
+}
+
+// تهريب أي HTML جوه نص التعليق عشان محدش يعمل حقن أكواد (XSS)
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.innerText = text;
+    return div.innerHTML;
+}
+
+// بيجيب كل التعليقات الرئيسية (top-level) في الفيديو عن طريق pagination
+// وبيرجع array فيه كل تعليق: صاحبه، ولينك قناته
+// بيوقف تلقائي لو عدد الصفحات زاد عن حد أقصى أماني (maxPages) عشان الصفحة متعلقش على فيديوهات فيها ملايين الكومنتات
+async function fetchAllTopLevelComments(videoId, onProgress) {
+    let allComments = [];
+    let pageToken = "";
+    let pageCount = 0;
+    const maxPages = 500; // حماية: يعني أقصى حاجة حوالي 50,000 تعليق قبل ما نوقف تلقائي
+
+    while (true) {
+        pageCount++;
+
+        let api = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=100&order=time&key=${API_KEY}`;
+        if (pageToken) {
+            api += `&pageToken=${pageToken}`;
+        }
+
+        const res = await fetch(api);
+        const data = await res.json();
+
+        if (data.error) {
+            // لو التعليقات مقفولة (403) أو أي خطأ تاني، نرمي الخطأ عشان الكود اللي نادي علينا يتعامل معاه
+            const err = new Error(data.error.message);
+            err.code = data.error.code;
+            err.reason = (data.error.errors && data.error.errors[0]) ? data.error.errors[0].reason : null;
+            throw err;
+        }
+
+        if (data.items && data.items.length > 0) {
+            const pageComments = data.items.map(item => {
+                const c = item.snippet.topLevelComment.snippet;
+                return {
+                    author: c.authorDisplayName,
+                    authorChannelId: c.authorChannelId ? c.authorChannelId.value : c.authorDisplayName,
+                    authorUrl: c.authorChannelUrl || null
+                };
+            });
+            allComments = allComments.concat(pageComments);
+        }
+
+        if (onProgress) {
+            onProgress(allComments.length, pageCount);
+        }
+
+        if (data.nextPageToken && pageCount < maxPages) {
+            pageToken = data.nextPageToken;
+        } else {
+            break;
+        }
+    }
+
+    return allComments;
+}
+
+function buildCommenterRanking(comments) {
+    // بنعد بـ authorChannelId (أدق من الاسم لأن أكتر من شخص ممكن يكون ليهم نفس الاسم المعروض)
+    const counts = {};
+
+    comments.forEach(c => {
+        const key = c.authorChannelId;
+        if (!counts[key]) {
+            counts[key] = {
+                author: c.author,
+                authorUrl: c.authorUrl,
+                count: 0
+            };
+        }
+        counts[key].count++;
+    });
+
+    const ranking = Object.values(counts);
+    ranking.sort((a, b) => b.count - a.count);
+
+    return ranking;
+}
+
+async function fetchTopComments(videoId) {
+    const commentsList = document.getElementById("commentsList");
+    const commentsSection = document.getElementById("commentsSection");
+
+    commentsSection.style.display = "block";
+    commentsList.innerHTML = `
+        <div class="progress-wrap">
+            <div id="progressText">جاري تحميل التعليقات... (0 تعليق)</div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+    `;
+
+    try {
+        const allComments = await fetchAllTopLevelComments(videoId, (loadedCount, pageCount) => {
+            const progressText = document.getElementById("progressText");
+            const progressFill = document.getElementById("progressFill");
+            if (progressText) {
+                progressText.innerText = `جاري تحميل التعليقات... (${loadedCount.toLocaleString()} تعليق)`;
+            }
+            if (progressFill) {
+                // مفيش عدد إجمالي معروف مقدماً، فبنحرك الشريط تدريجي بشكل تقريبي بناءً على عدد الصفحات
+                const approxPct = Math.min(95, pageCount * 4);
+                progressFill.style.width = approxPct + "%";
+            }
+        });
+
+        if (allComments.length === 0) {
+            commentsList.innerHTML = '<div class="no-comments">مفيش تعليقات على الفيديو ده</div>';
+            return;
+        }
+
+        const ranking = buildCommenterRanking(allComments);
+
+        commentsList.innerHTML = "";
+
+        // كارت الفايز (أكتر شخص كتب كومنتات)
+        const winner = ranking[0];
+        const winnerAuthorHtml = winner.authorUrl
+            ? `<a href="${winner.authorUrl}" target="_blank">${escapeHtml(winner.author)}</a>`
+            : escapeHtml(winner.author);
+
+        const winnerDiv = document.createElement("div");
+        winnerDiv.className = "winner-card";
+        winnerDiv.innerHTML = `
+            <div class="winner-label">🎁 الفايز بالتحدي</div>
+            <div class="winner-name">${winnerAuthorHtml}</div>
+            <div class="winner-count">${winner.count.toLocaleString()} كومنت</div>
+        `;
+        commentsList.appendChild(winnerDiv);
+
+        // لو في تعادل على المركز الأول، ننبه المستخدم
+        const tiedWithWinner = ranking.filter(r => r.count === winner.count);
+        if (tiedWithWinner.length > 1) {
+            const tieNote = document.createElement("div");
+            tieNote.className = "no-comments";
+            tieNote.style.marginBottom = "15px";
+            tieNote.innerText = `⚠️ في تعادل: ${tiedWithWinner.length} أشخاص كتبوا نفس العدد (${winner.count} كومنت). شوف القايمة تحت لكل الأسامي.`;
+            commentsList.appendChild(tieNote);
+        }
+
+        // باقي الترتيب (أعلى 10 شامل الفايز)
+        const rankingHeader = document.createElement("h2");
+        rankingHeader.style.marginTop = "20px";
+        rankingHeader.style.marginBottom = "12px";
+        rankingHeader.style.fontSize = "17px";
+        rankingHeader.style.color = "#a98a87";
+        rankingHeader.innerText = "الترتيب الكامل";
+        commentsList.appendChild(rankingHeader);
+
+        const top10 = ranking.slice(0, 10);
+
+        top10.forEach((person, index) => {
+            const div = document.createElement("div");
+            div.className = "ranking-item";
+            if (index === 0) div.classList.add("rank-gold");
+            else if (index === 1) div.classList.add("rank-silver");
+            else if (index === 2) div.classList.add("rank-bronze");
+
+            const authorHtml = person.authorUrl
+                ? `<a href="${person.authorUrl}" target="_blank">${escapeHtml(person.author)}</a>`
+                : escapeHtml(person.author);
+
+            div.innerHTML = `
+                <div class="ranking-rank">${index + 1}</div>
+                <div class="ranking-name">${authorHtml}</div>
+                <div class="ranking-count">${person.count.toLocaleString()} كومنت</div>
+            `;
+
+            commentsList.appendChild(div);
+        });
+
+        // ملاحظة توضيحية أسفل القايمة
+        const note = document.createElement("div");
+        note.style.marginTop = "15px";
+        note.style.fontSize = "12px";
+        note.style.color = "#8f7472";
+        note.style.textAlign = "center";
+        note.innerText = `تم فحص ${allComments.length.toLocaleString()} تعليق رئيسي (بدون الردود على الكومنتات)`;
+        commentsList.appendChild(note);
+
+    } catch (e) {
+        console.error(e);
+        if (e.reason === "commentsDisabled") {
+            commentsList.innerHTML = '<div class="no-comments">التعليقات مقفولة على الفيديو ده</div>';
+        } else {
+            commentsList.innerHTML = `<div class="no-comments">تعذر تحميل التعليقات: ${escapeHtml(e.message)}</div>`;
+        }
+    }
+}
+
+async function analyze() {
+    const btn = document.getElementById("analyzeBtn");
+
+    try {
+        let url = document.getElementById("videoUrl").value;
+        let id = getVideoId(url);
+
+        if (!id) {
+            alert("رابط يوتيوب غير صحيح");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "جاري التحليل...";
+
+        let api = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${id}&key=${API_KEY}`;
+
+        let res = await fetch(api);
+        let data = await res.json();
+
+        console.log(data);
+
+        if (data.error) {
+            alert(data.error.message);
+            return;
+        }
+
+        if (!data.items || data.items.length === 0) {
+            alert("الفيديو غير موجود");
+            return;
+        }
+
+        let v = data.items[0];
+
+        document.getElementById("thumb").src = v.snippet.thumbnails.high.url;
+        document.getElementById("title").innerText = v.snippet.title;
+        document.getElementById("channel").innerText = v.snippet.channelTitle;
+        document.getElementById("views").innerText = Number(v.statistics.viewCount).toLocaleString();
+        document.getElementById("likes").innerText = v.statistics.likeCount || "مخفي";
+        document.getElementById("comments").innerText =
+            v.statistics.commentCount !== undefined ? v.statistics.commentCount : "معطّلة";
+
+        document.getElementById("result").style.display = "block";
+
+        // بعد ما نجيب بيانات الفيديو، نجيب التعليقات
+        await fetchTopComments(id);
+
+    } catch (e) {
+        console.error(e);
+        alert(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "تحليل الفيديو";
+    }
+}
+
+// بياخد رابط قناة بأي شكل (channel/UC.., @handle, /c/, /user/) ويرجع النوع والقيمة
+// عشان نعرف نستخدم الـ parameter الصح مع channels API (id / forHandle / forUsername)
+function parseChannelUrl(url) {
+    url = url.trim();
+
+    // شكل: UCxxxxxxxxxxxxxxxxxxxxxx (الـ channel ID لوحده بدون رابط)
+    if (/^UC[a-zA-Z0-9_-]{22}$/.test(url)) {
+        return { type: "id", value: url };
+    }
+
+    // شكل: @handle لوحده بدون رابط
+    if (/^@[a-zA-Z0-9_.-]+$/.test(url)) {
+        return { type: "handle", value: url };
+    }
+
+    let m;
+
+    m = url.match(/youtube\.com\/channel\/(UC[a-zA-Z0-9_-]{22})/);
+    if (m) return { type: "id", value: m[1] };
+
+    m = url.match(/youtube\.com\/@([a-zA-Z0-9_.-]+)/);
+    if (m) return { type: "handle", value: "@" + m[1] };
+
+    m = url.match(/youtube\.com\/c\/([a-zA-Z0-9_.-]+)/);
+    if (m) return { type: "handle", value: "@" + m[1] };
+
+    m = url.match(/youtube\.com\/user\/([a-zA-Z0-9_.-]+)/);
+    if (m) return { type: "username", value: m[1] };
+
+    return null;
+}
+
+async function analyzeChannel() {
+    const btn = document.getElementById("channelBtn");
+
+    try {
+        let url = document.getElementById("channelUrl").value;
+        let parsed = parseChannelUrl(url);
+
+        if (!parsed) {
+            alert("رابط قناة غير صحيح");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "جاري التحميل...";
+
+        let paramName = parsed.type === "id" ? "id"
+            : parsed.type === "handle" ? "forHandle"
+            : "forUsername";
+
+        let api = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&${paramName}=${encodeURIComponent(parsed.value)}&key=${API_KEY}`;
+
+        let res = await fetch(api);
+        let data = await res.json();
+
+        console.log(data);
+
+        if (data.error) {
+            alert(data.error.message);
+            return;
+        }
+
+        if (!data.items || data.items.length === 0) {
+            alert("القناة غير موجودة");
+            return;
+        }
+
+        let c = data.items[0];
+
+        document.getElementById("channelThumb").src = c.snippet.thumbnails.high
+            ? c.snippet.thumbnails.high.url
+            : c.snippet.thumbnails.default.url;
+
+        document.getElementById("channelName").innerHTML =
+            `<a href="https://www.youtube.com/channel/${c.id}" target="_blank">${escapeHtml(c.snippet.title)}</a>`;
+
+        document.getElementById("channelHandle").innerText =
+            c.snippet.customUrl ? "@" + c.snippet.customUrl.replace(/^@/, "") : "";
+
+        document.getElementById("channelSubs").innerText =
+            c.statistics.hiddenSubscriberCount
+                ? "مخفي"
+                : Number(c.statistics.subscriberCount).toLocaleString();
+
+        document.getElementById("channelVideos").innerText =
+            Number(c.statistics.videoCount).toLocaleString();
+
+        document.getElementById("channelViews").innerText =
+            Number(c.statistics.viewCount).toLocaleString();
+
+        document.getElementById("channelResult").style.display = "block";
+
+    } catch (e) {
+        console.error(e);
+        alert(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "عرض بيانات القناة";
+    }
+}
+
+/* ======================================================
+   الجزء ده كله إضافة جديدة - مفيش أي دالة قديمة اتلمست.
+   1) تبديل الوضع الداكن/الفاتح
+   2) نسخ إعلان الفايز بضغطة واحدة (بيراقب ظهور كارت الفايز
+      من غير ما يعدل في دالة fetchTopComments الأصلية)
+   ====================================================== */
+
+(function () {
+    const toggleBtn = document.getElementById("themeToggleBtn");
+    const iconEl = document.getElementById("themeToggleIcon");
+    let isLightMode = false;
+
+    function applyTheme() {
+        document.body.classList.toggle("light-mode", isLightMode);
+        if (iconEl) iconEl.textContent = isLightMode ? "☀️" : "🌙";
+        if (toggleBtn) {
+            const label = isLightMode ? "تفعيل الوضع الداكن" : "تفعيل الوضع الفاتح";
+            toggleBtn.setAttribute("aria-label", label);
+            toggleBtn.title = "تبديل الوضع الداكن/الفاتح";
+        }
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+            isLightMode = !isLightMode;
+            applyTheme();
+        });
+    }
+
+    applyTheme();
+})();
+
+(function () {
+    const commentsListEl = document.getElementById("commentsList");
+    if (!commentsListEl) return;
+
+    const winnerObserver = new MutationObserver(() => {
+        const winnerCard = commentsListEl.querySelector(".winner-card");
+        if (!winnerCard || winnerCard.querySelector(".copy-winner-btn")) return;
+
+        const nameEl = winnerCard.querySelector(".winner-name");
+        const countEl = winnerCard.querySelector(".winner-count");
+        const titleEl = document.getElementById("title");
+
+        const winnerName = nameEl ? nameEl.innerText.trim() : "";
+        const winnerCount = countEl ? countEl.innerText.trim() : "";
+        const videoTitle = titleEl ? titleEl.innerText.trim() : "";
+
+        const copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.className = "copy-winner-btn";
+        copyBtn.innerText = "📋 نسخ إعلان الفايز";
+
+        copyBtn.addEventListener("click", async () => {
+            const text = `🎉 مبروك ${winnerName}!\nالفايز بتحدي أكتر تعليقات على فيديو "${videoTitle}"\nبإجمالي ${winnerCount} 🎁`;
+            try {
+                await navigator.clipboard.writeText(text);
+                copyBtn.innerText = "✅ اتنسخ";
+            } catch (err) {
+                copyBtn.innerText = "تعذر النسخ";
+            }
+            setTimeout(() => { copyBtn.innerText = "📋 نسخ إعلان الفايز"; }, 2000);
+        });
+
+        winnerCard.appendChild(copyBtn);
+    });
+
+    winnerObserver.observe(commentsListEl, { childList: true, subtree: true });
+})();
+
+/* ======================================================
+   فكرة إضافية: زرار نسخ سريع لبيانات الفيديو وبيانات القناة
+   بيتحط جوه الكارتين الموجودين (result / channelResult) عن طريق
+   إنشاء الزرار وإضافته بالجافاسكريبت بس - من غير أي تعديل على
+   analyze() أو analyzeChannel() الأصليين ولا أي HTML موجود.
+   ممكن تتشال بسهولة لو مش عايزها، الكود كله في البلوك ده بس.
+   ====================================================== */
+
+(function () {
+    function addCopyStatsButton(cardId, label, buildText) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "copy-winner-btn";
+        btn.innerText = label;
+        btn.style.display = "flex";
+        btn.style.width = "fit-content";
+        btn.style.margin = "14px auto 0";
+
+        btn.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(buildText());
+                btn.innerText = "✅ اتنسخ";
+            } catch (err) {
+                btn.innerText = "تعذر النسخ";
+            }
+            setTimeout(() => { btn.innerText = label; }, 2000);
+        });
+
+        card.appendChild(btn);
+    }
+
+    function textOf(id) {
+        const el = document.getElementById(id);
+        return el ? el.innerText.trim() : "";
+    }
+
+    addCopyStatsButton("result", "📋 نسخ بيانات الفيديو", () =>
+        `📺 ${textOf("title")}\nالقناة: ${textOf("channel")}\nالمشاهدات: ${textOf("views")}\nالإعجابات: ${textOf("likes")}\nالتعليقات: ${textOf("comments")}`
+    );
+
+    addCopyStatsButton("channelResult", "📋 نسخ بيانات القناة", () =>
+        `📺 ${textOf("channelName")} ${textOf("channelHandle")}\nالمشتركين: ${textOf("channelSubs")}\nعدد الفيديوهات: ${textOf("channelVideos")}\nإجمالي المشاهدات: ${textOf("channelViews")}`
+    );
+})();
+
+/* ======================================================
+   من هنا لحد آخر الملف: إضافات جديدة بس (مرحلة 2).
+   ولا سطر واحد اتغير أو اتحذف من أي كود فوق ده - سواء الأصلي
+   أو الإضافات اللي كانت موجودة قبل كده. كل حاجة هنا بتضيف ميزة
+   جديدة وبس، وسهل تشيلها لو حبيت من غير ما تأثر على أي حاجة تانية.
+
+   الميزات الجديدة:
+   1) زرار "مشاهدة الفيديو على يوتيوب" + تاريخ النشر + معدل التفاعل
+      (بتتحسب من نفس رد الـ API اللي analyze() أصلاً بتجيبه - من
+      غير أي طلب إضافي على الـ quota بتاعك)
+   2) عمر القناة ومتوسط المشاهدات لكل فيديو (نفس الفكرة، من رد
+      الـ API اللي analyzeChannel() بتجيبه أصلاً)
+   3) حفظ الترتيب الكامل للمعلقين (مش بس أول 10) + زرار نسخ
+      وزرار تحميل ملف نصي بيهم كلهم
+   4) دعم زرار Enter في خانة رابط الفيديو وخانة رابط القناة
+   ====================================================== */
+
+// ---------- دوال مساعدة عامة (تنسيق تاريخ عربي + معدل تفاعل) ----------
+
+function relativeArabicFromDays(diffDays) {
+    if (diffDays <= 0) return "اليوم";
+    if (diffDays === 1) return "منذ يوم";
+    if (diffDays === 2) return "منذ يومين";
+    if (diffDays < 11) return `منذ ${diffDays} أيام`;
+    if (diffDays < 30) return `منذ ${diffDays} يوم`;
+
+    if (diffDays < 365) {
+        const m = Math.max(1, Math.round(diffDays / 30));
+        if (m === 1) return "منذ شهر";
+        if (m === 2) return "منذ شهرين";
+        if (m < 11) return `منذ ${m} أشهر`;
+        return `منذ ${m} شهر`;
+    }
+
+    const y = Math.max(1, Math.round(diffDays / 365));
+    if (y === 1) return "منذ سنة";
+    if (y === 2) return "منذ سنتين";
+    if (y < 11) return `منذ ${y} سنوات`;
+    return `منذ ${y} سنة`;
+}
+
+function formatArabicDate(isoString) {
+    const months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+                     "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return "-";
+
+    const absolute = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    const diffDays = Math.floor((new Date() - d) / 86400000);
+
+    return `${absolute} (${relativeArabicFromDays(diffDays)})`;
+}
+
+function formatChannelAge(isoString) {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return "-";
+
+    const totalMonths = Math.max(0, Math.floor((new Date() - d) / (86400000 * 30.44)));
+
+    if (totalMonths < 1) return "أقل من شهر";
+
+    if (totalMonths < 12) {
+        if (totalMonths === 1) return "شهر واحد";
+        if (totalMonths === 2) return "شهرين";
+        if (totalMonths < 11) return `${totalMonths} أشهر`;
+        return `${totalMonths} شهر`;
+    }
+
+    const years = Math.floor(totalMonths / 12);
+    if (years === 1) return "سنة واحدة";
+    if (years === 2) return "سنتين";
+    if (years < 11) return `${years} سنوات`;
+    return `${years} سنة`;
+}
+
+// views/likes/comments بتتحسب من نفس أرقام الـ API الخام (مش من النص المنسق
+// اللي ظاهر في الصفحة) عشان تكون دقيقة. likes ممكن تيجي null لو الإعجابات مخفية.
+function computeEngagementInfo(views, likes, commentsCount) {
+    if (!views || views <= 0) return null;
+
+    const effectiveLikes = likes === null ? 0 : likes;
+    const rate = ((effectiveLikes + commentsCount) / views) * 100;
+
+    let emoji, label;
+    if (rate >= 8) { emoji = "🟢"; label = "ممتاز"; }
+    else if (rate >= 4) { emoji = "🟡"; label = "جيد"; }
+    else if (rate >= 1) { emoji = "🟠"; label = "متوسط"; }
+    else { emoji = "⚪"; label = "منخفض"; }
+
+    let text = `${rate.toFixed(2)}% ${emoji} ${label}`;
+    if (likes === null) text += " (بدون الإعجابات لأنها مخفية)";
+
+    return { text };
+}
+
+/* ======================================================
+   اعتراض (interception) لطلبات fetch الأصلية عشان نلقط بيانات
+   إضافية (تاريخ النشر، تاريخ إنشاء القناة...) من نفس الردود اللي
+   analyze() و analyzeChannel() بيجيبوها أصلاً - يعني صفر طلبات
+   API إضافية وصفر استهلاك زيادة في الـ quota بتاعك. الدالتين
+   الأصليتين مش بيتلمسوا خالص، وأي رد بيوصل لهم زي ما هو تمامًا.
+   ====================================================== */
+(function () {
+    if (typeof window.fetch !== "function") return;
+    const originalFetch = window.fetch;
+
+    window.fetch = function (...args) {
+        const promise = originalFetch.apply(this, args);
+
+        try {
+            const target = args[0];
+            const urlStr = typeof target === "string" ? target : (target && target.url) || "";
+
+            if (urlStr.indexOf("youtube/v3/videos") !== -1) {
+                promise.then(res => {
+                    res.clone().json().then(data => {
+                        if (data && !data.error && data.items && data.items[0]) {
+                            window.dispatchEvent(new CustomEvent("yt:videoData", { detail: data.items[0] }));
+                        }
+                    }).catch(() => {});
+                }).catch(() => {});
+            } else if (urlStr.indexOf("youtube/v3/channels") !== -1) {
+                promise.then(res => {
+                    res.clone().json().then(data => {
+                        if (data && !data.error && data.items && data.items[0]) {
+                            window.dispatchEvent(new CustomEvent("yt:channelData", { detail: data.items[0] }));
+                        }
+                    }).catch(() => {});
+                }).catch(() => {});
+            }
+        } catch (e) {}
+
+        return promise;
+    };
+})();
+
+/* بيانات إضافية لكارت الفيديو: تاريخ النشر + معدل التفاعل + زرار المشاهدة */
+(function () {
+    window.addEventListener("yt:videoData", (ev) => {
+        try {
+            const item = ev.detail || {};
+            const stats = item.statistics || {};
+            const snippet = item.snippet || {};
+
+            const publishedRow = document.getElementById("publishedRow");
+            const publishedSpan = document.getElementById("publishedDate");
+            if (publishedSpan && snippet.publishedAt) {
+                publishedSpan.textContent = formatArabicDate(snippet.publishedAt);
+                if (publishedRow) publishedRow.style.display = "flex";
+            }
+
+            const engagementRow = document.getElementById("engagementRow");
+            const engagementSpan = document.getElementById("engagementRate");
+            const views = Number(stats.viewCount || 0);
+            const likes = stats.likeCount !== undefined ? Number(stats.likeCount) : null;
+            const commentsCount = stats.commentCount !== undefined ? Number(stats.commentCount) : 0;
+            const info = computeEngagementInfo(views, likes, commentsCount);
+            if (engagementSpan && info) {
+                engagementSpan.textContent = info.text;
+                if (engagementRow) engagementRow.style.display = "flex";
+            }
+
+            const watchBtn = document.getElementById("watchVideoBtn");
+            if (watchBtn && item.id) {
+                watchBtn.href = "https://www.youtube.com/watch?v=" + item.id;
+                watchBtn.style.display = "flex";
+            }
+        } catch (e) {}
+    });
+})();
+
+/* بيانات إضافية لكارت القناة: عمر القناة + متوسط المشاهدات لكل فيديو */
+(function () {
+    window.addEventListener("yt:channelData", (ev) => {
+        try {
+            const item = ev.detail || {};
+            const stats = item.statistics || {};
+            const snippet = item.snippet || {};
+
+            const avgViewsEl = document.getElementById("channelAvgViews");
+            if (avgViewsEl) {
+                const viewCount = Number(stats.viewCount || 0);
+                const videoCount = Number(stats.videoCount || 0);
+                avgViewsEl.textContent = videoCount > 0
+                    ? Math.round(viewCount / videoCount).toLocaleString()
+                    : "-";
+            }
+
+            const ageEl = document.getElementById("channelAge");
+            if (ageEl && snippet.publishedAt) {
+                ageEl.textContent = formatChannelAge(snippet.publishedAt);
+            }
+        } catch (e) {}
+    });
+})();
+
+/* ======================================================
+   حفظ الترتيب الكامل للمعلقين (مش بس أول 10 اللي بيظهروا) عن طريق
+   "لف" دالة buildCommenterRanking بدالة جديدة بتنادي على الأصلية
+   زي ما هي بالظبط وبعدين تحتفظ بنسخة من نتيجتها بس - من غير أي
+   تعديل في جسم الدالة الأصلية ولا في fetchTopComments.
+   ====================================================== */
+(function () {
+    if (typeof window.buildCommenterRanking === "function") {
+        const originalBuildRanking = window.buildCommenterRanking;
+        window.buildCommenterRanking = function (comments) {
+            const result = originalBuildRanking(comments);
+            window.__lastFullRanking = result;
+
+            const actions = document.getElementById("rankingActions");
+            if (actions && result && result.length) actions.style.display = "flex";
+
+            return result;
+        };
+    }
+
+    if (typeof window.fetchTopComments === "function") {
+        const originalFetchTopComments = window.fetchTopComments;
+        window.fetchTopComments = function (videoId) {
+            window.__lastFullRanking = null;
+
+            const actions = document.getElementById("rankingActions");
+            if (actions) actions.style.display = "none";
+
+            return originalFetchTopComments.apply(this, arguments);
+        };
+    }
+})();
+
+/* زراير نسخ/تحميل الترتيب الكامل */
+(function () {
+    function buildFullRankingText() {
+        const ranking = window.__lastFullRanking || [];
+        const titleEl = document.getElementById("title");
+        const title = titleEl ? titleEl.innerText.trim() : "";
+
+        const lines = [];
+        lines.push("الترتيب الكامل للمعلقين" + (title ? " - " + title : ""));
+        lines.push("عدد المعلقين: " + ranking.length.toLocaleString());
+        lines.push("------------------------------------");
+
+        ranking.forEach((person, i) => {
+            const link = person.authorUrl ? "  " + person.authorUrl : "";
+            lines.push((i + 1) + ". " + person.author + " - " + person.count + " كومنت" + link);
+        });
+
+        return lines.join("\n");
+    }
+
+    function downloadTextFile(filename, text) {
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+
+    const copyBtn = document.getElementById("copyFullRankingBtn");
+    if (copyBtn) {
+        const originalLabel = copyBtn.innerText;
+        copyBtn.addEventListener("click", async () => {
+            if (!window.__lastFullRanking || !window.__lastFullRanking.length) return;
+            try {
+                await navigator.clipboard.writeText(buildFullRankingText());
+                copyBtn.innerText = "✅ اتنسخ";
+            } catch (err) {
+                copyBtn.innerText = "تعذر النسخ";
+            }
+            setTimeout(() => { copyBtn.innerText = originalLabel; }, 2000);
+        });
+    }
+
+    const downloadBtn = document.getElementById("downloadFullRankingBtn");
+    if (downloadBtn) {
+        downloadBtn.addEventListener("click", () => {
+            if (!window.__lastFullRanking || !window.__lastFullRanking.length) return;
+            downloadTextFile("ترتيب_المعلقين.txt", buildFullRankingText());
+        });
+    }
+})();
+
+/* دعم زرار Enter جوه خانة رابط الفيديو وخانة رابط القناة */
+(function () {
+    function bindEnterKey(inputId, action) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                action();
+            }
+        });
+    }
+
+    bindEnterKey("videoUrl", () => { if (typeof analyze === "function") analyze(); });
+    bindEnterKey("channelUrl", () => { if (typeof analyzeChannel === "function") analyzeChannel(); });
+})();
+
+/* ======================================================
+   من هنا لحد آخر الملف: إضافات جديدة تانية بس (مرحلة 3).
+   ولا سطر واحد اتغير أو اتحذف من أي كود فوق ده - سواء الأصلي أو
+   أي إضافة قبل كده (مرحلة 1 أو 2). كل حاجة هنا بتضيف ميزة جديدة
+   وبس، وسهل تشيلها لو حبيت من غير ما تأثر على أي حاجة تانية.
+
+   الميزات الجديدة:
+   1) (اتشالت لاحقًا بطلب صريح - راجع ملاحظة الحذف في آخر الملف)
+      كانت هنا حقل "رابط إضافي" + زرار نسخ إعلان الفايز ومعاه الرابط
+   2) زرار نسخ رابط الفيديو + إظهار وصف الفيديو (روابط جواه قابلة للنقر)
+   3) نفس الفكرة لكارت القناة: نسخ رابط القناة + إظهار وصف القناة
+   4) بحث عن معلق معين بالاسم جوه الترتيب الكامل
+   5) تحميل الترتيب الكامل بصيغة CSV (بجانب TXT الموجودة)
+   ====================================================== */
+
+// بتحول أي رابط (http/https/www) لاقياه جوه نص عادي لعنصر <a> قابل
+// للنقر، وبترجع DocumentFragment جاهز للإضافة بالـ appendChild.
+// مش بتستخدم innerHTML خالص عشان تفادي أي مشكلة حقن أكواد من نص
+// جاي من يوتيوب (وصف الفيديو/القناة نص حر ممكن أي حد يكتبه).
+function linkifyIntoFragment(text) {
+    const frag = document.createDocumentFragment();
+    if (!text) return frag;
+
+    const urlRegex = /((?:https?:\/\/|www\.)[^\s]+)/gi;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = urlRegex.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+            frag.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+        }
+
+        let rawUrl = match[0];
+        let trailing = "";
+        const trailingMatch = rawUrl.match(/[).,!?;:،؛]+$/);
+        if (trailingMatch) {
+            trailing = trailingMatch[0];
+            rawUrl = rawUrl.slice(0, rawUrl.length - trailing.length);
+        }
+
+        if (rawUrl) {
+            const a = document.createElement("a");
+            a.href = /^https?:\/\//i.test(rawUrl) ? rawUrl : "https://" + rawUrl;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = rawUrl;
+            frag.appendChild(a);
+        }
+
+        if (trailing) frag.appendChild(document.createTextNode(trailing));
+
+        lastIndex = urlRegex.lastIndex;
+    }
+
+    if (lastIndex < text.length) {
+        frag.appendChild(document.createTextNode(text.slice(lastIndex)));
+    }
+
+    return frag;
+}
+
+/* بيانات إضافية تانية لكارت الفيديو: زرار نسخ رابط الفيديو + زرار
+   إظهار/إخفاء وصف الفيديو (مع تحويل أي رابط جواه لرابط قابل للنقر).
+   بيسمع لنفس event "yt:videoData" الموجود أصلاً من غير أي تعديل على
+   الـ listener التاني اللي بيملى تاريخ النشر ومعدل التفاعل. */
+(function () {
+    let currentDescription = "";
+
+    window.addEventListener("yt:videoData", (ev) => {
+        try {
+            const item = ev.detail || {};
+            const snippet = item.snippet || {};
+
+            currentDescription = snippet.description || "";
+
+            const actionsRow = document.getElementById("videoExtraActions");
+            const copyLinkBtn = document.getElementById("copyVideoLinkBtn");
+            const descBox = document.getElementById("videoDescBox");
+            const toggleBtn = document.getElementById("videoDescToggleBtn");
+
+            if (actionsRow) actionsRow.style.display = "flex";
+
+            if (copyLinkBtn && item.id) {
+                copyLinkBtn.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText("https://www.youtube.com/watch?v=" + item.id);
+                        copyLinkBtn.innerText = "✅ اتنسخ";
+                    } catch (err) {
+                        copyLinkBtn.innerText = "تعذر النسخ";
+                    }
+                    setTimeout(() => { copyLinkBtn.innerText = "🔗 نسخ رابط الفيديو"; }, 2000);
+                };
+            }
+
+            if (descBox) {
+                descBox.innerHTML = "";
+                descBox.style.display = "none";
+            }
+            if (toggleBtn) toggleBtn.innerText = "📝 إظهار وصف الفيديو";
+
+        } catch (e) {}
+    });
+
+    const toggleBtn = document.getElementById("videoDescToggleBtn");
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+            const descBox = document.getElementById("videoDescBox");
+            if (!descBox) return;
+
+            const isHidden = descBox.style.display === "none" || !descBox.style.display;
+            if (isHidden) {
+                descBox.innerHTML = "";
+                descBox.appendChild(linkifyIntoFragment(currentDescription));
+                descBox.style.display = "block";
+                toggleBtn.innerText = "🙈 إخفاء وصف الفيديو";
+            } else {
+                descBox.style.display = "none";
+                toggleBtn.innerText = "📝 إظهار وصف الفيديو";
+            }
+        });
+    }
+})();
+
+/* نفس الفكرة بالظبط لكارت القناة: زرار نسخ رابط القناة + زرار
+   إظهار/إخفاء وصف القناة. بيسمع لنفس event "yt:channelData" الموجود
+   أصلاً من غير أي تعديل على الـ listener التاني اللي بيملى عمر
+   القناة ومتوسط المشاهدات. */
+(function () {
+    let currentChannelDescription = "";
+
+    window.addEventListener("yt:channelData", (ev) => {
+        try {
+            const item = ev.detail || {};
+            const snippet = item.snippet || {};
+
+            currentChannelDescription = snippet.description || "";
+
+            const actionsRow = document.getElementById("channelExtraActions");
+            const copyLinkBtn = document.getElementById("copyChannelLinkBtn");
+            const descBox = document.getElementById("channelDescBox");
+            const toggleBtn = document.getElementById("channelDescToggleBtn");
+
+            if (actionsRow) actionsRow.style.display = "flex";
+
+            if (copyLinkBtn && item.id) {
+                copyLinkBtn.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText("https://www.youtube.com/channel/" + item.id);
+                        copyLinkBtn.innerText = "✅ اتنسخ";
+                    } catch (err) {
+                        copyLinkBtn.innerText = "تعذر النسخ";
+                    }
+                    setTimeout(() => { copyLinkBtn.innerText = "🔗 نسخ رابط القناة"; }, 2000);
+                };
+            }
+
+            if (descBox) {
+                descBox.innerHTML = "";
+                descBox.style.display = "none";
+            }
+            if (toggleBtn) toggleBtn.innerText = "📝 إظهار وصف القناة";
+
+        } catch (e) {}
+    });
+
+    const toggleBtn = document.getElementById("channelDescToggleBtn");
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+            const descBox = document.getElementById("channelDescBox");
+            if (!descBox) return;
+
+            const isHidden = descBox.style.display === "none" || !descBox.style.display;
+            if (isHidden) {
+                descBox.innerHTML = "";
+                descBox.appendChild(linkifyIntoFragment(currentChannelDescription));
+                descBox.style.display = "block";
+                toggleBtn.innerText = "🙈 إخفاء وصف القناة";
+            } else {
+                descBox.style.display = "none";
+                toggleBtn.innerText = "📝 إظهار وصف القناة";
+            }
+        });
+    }
+})();
+
+/* زرار تحميل الترتيب الكامل للمعلقين بصيغة CSV (بجانب صيغة txt
+   الموجودة أصلاً) عشان يسهل فتحه في Excel أو Google Sheets. بيستخدم
+   نفس window.__lastFullRanking المحفوظة أصلاً - من غير أي طلب API
+   إضافي ومن غير أي تعديل على أي كود قديم. */
+(function () {
+    function csvEscape(value) {
+        const str = String(value == null ? "" : value);
+        if (/[",\n]/.test(str)) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    }
+
+    function buildFullRankingCsv() {
+        const ranking = window.__lastFullRanking || [];
+        const rows = [["الترتيب", "الاسم", "عدد الكومنتات", "رابط القناة"]];
+
+        ranking.forEach((person, i) => {
+            rows.push([i + 1, person.author, person.count, person.authorUrl || ""]);
+        });
+
+        // \uFEFF (BOM) في الأول عشان اكسل يقرأ الحروف العربية صح من غير ما تبقى رموز غريبة
+        return "\uFEFF" + rows.map(row => row.map(csvEscape).join(",")).join("\r\n");
+    }
+
+    function downloadBlobFile(filename, content, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+
+    const csvBtn = document.getElementById("downloadFullRankingCsvBtn");
+    if (csvBtn) {
+        csvBtn.addEventListener("click", () => {
+            if (!window.__lastFullRanking || !window.__lastFullRanking.length) return;
+            downloadBlobFile("ترتيب_المعلقين.csv", buildFullRankingCsv(), "text/csv;charset=utf-8");
+        });
+    }
+})();
+
+/* خانة بحث عن معلق معين بالاسم جوه الترتيب الكامل (مش بس أول 10
+   الظاهرين في الصفحة). بتعتمد على "لف" إضافي فوق buildCommenterRanking
+   و fetchTopComments (اللي هما أصلاً كانوا اتلفوا مرة قبل كده في
+   إضافة سابقة/مرحلة 2) - يعني اللف هنا بينادي على النسخة الملفوفة
+   اللي قبله زي ما هي بالظبط، من غير ما يلمس جسمها. نفس فكرة الطبقات
+   اللي الملف كله ماشي عليها من الأول. */
+(function () {
+    if (typeof window.buildCommenterRanking === "function") {
+        const previousBuildRanking = window.buildCommenterRanking;
+        window.buildCommenterRanking = function (comments) {
+            const result = previousBuildRanking(comments);
+
+            const searchWrap = document.getElementById("rankingSearchWrap");
+            if (searchWrap) searchWrap.style.display = result && result.length ? "block" : "none";
+
+            return result;
+        };
+    }
+
+    if (typeof window.fetchTopComments === "function") {
+        const previousFetchTopComments = window.fetchTopComments;
+        window.fetchTopComments = function (videoId) {
+            const searchWrap = document.getElementById("rankingSearchWrap");
+            const searchInput = document.getElementById("rankingSearchInput");
+            const searchResults = document.getElementById("rankingSearchResults");
+
+            if (searchWrap) searchWrap.style.display = "none";
+            if (searchInput) searchInput.value = "";
+            if (searchResults) searchResults.innerHTML = "";
+
+            return previousFetchTopComments.apply(this, arguments);
+        };
+    }
+
+    function runSearch() {
+        const input = document.getElementById("rankingSearchInput");
+        const resultsBox = document.getElementById("rankingSearchResults");
+        if (!input || !resultsBox) return;
+
+        const query = input.value.trim().toLowerCase();
+        resultsBox.innerHTML = "";
+
+        if (!query) return;
+
+        const ranking = window.__lastFullRanking || [];
+        const matches = [];
+        for (let i = 0; i < ranking.length; i++) {
+            if (ranking[i].author && ranking[i].author.toLowerCase().indexOf(query) !== -1) {
+                matches.push({ person: ranking[i], rank: i + 1 });
+            }
+        }
+
+        if (matches.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "no-comments";
+            empty.innerText = "مفيش حد بالاسم ده في الترتيب";
+            resultsBox.appendChild(empty);
+            return;
+        }
+
+        const maxShown = 30;
+        matches.slice(0, maxShown).forEach(({ person, rank }) => {
+            const div = document.createElement("div");
+            div.className = "ranking-item";
+            if (rank === 1) div.classList.add("rank-gold");
+            else if (rank === 2) div.classList.add("rank-silver");
+            else if (rank === 3) div.classList.add("rank-bronze");
+
+            const rankEl = document.createElement("div");
+            rankEl.className = "ranking-rank";
+            rankEl.innerText = rank;
+
+            const nameEl = document.createElement("div");
+            nameEl.className = "ranking-name";
+            if (person.authorUrl) {
+                const a = document.createElement("a");
+                a.href = person.authorUrl;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.textContent = person.author;
+                nameEl.appendChild(a);
+            } else {
+                nameEl.textContent = person.author;
+            }
+
+            const countEl = document.createElement("div");
+            countEl.className = "ranking-count";
+            countEl.innerText = person.count.toLocaleString() + " كومنت";
+
+            div.appendChild(rankEl);
+            div.appendChild(nameEl);
+            div.appendChild(countEl);
+            resultsBox.appendChild(div);
+        });
+
+        if (matches.length > maxShown) {
+            const note = document.createElement("div");
+            note.className = "ranking-search-note";
+            note.innerText = `+${(matches.length - maxShown).toLocaleString()} نتيجة تانية مش ظاهرة، ضيّق البحث أكتر`;
+            resultsBox.appendChild(note);
+        }
+    }
+
+    const searchBtn = document.getElementById("rankingSearchBtn");
+    if (searchBtn) searchBtn.addEventListener("click", runSearch);
+
+    const searchInput = document.getElementById("rankingSearchInput");
+    if (searchInput) {
+        searchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                runSearch();
+            }
+        });
+    }
+})();
+
+/* ======================================================
+   من هنا لحد آخر الملف: إضافات جديدة (مرحلة 4) + ملاحظة حذف.
+   ولا سطر واحد اتغير أو اتحذف من أي كود فوق ده - سواء الأصلي أو أي
+   إضافة قبل كده (مرحلة 1 أو 2 أو 3)، غير حقل "رابط إضافي" وزرار
+   "نسخ الإعلان + الرابط" اللي كانوا مضافين في مرحلة 3.
+
+   ملاحظة حذف: الحقل والزرار دول اتشالوا بالكامل (من الـ HTML ومن
+   الـ JS) بناءً على طلب صريح - مش عن طريق الخطأ، ومفيش أي أثر ليهم
+   في الملف دلوقتي. باقي كل حاجة تانية (الأصلية + مرحلة 1 و2 و3 اللي
+   فاضلة) شغالة زي ما هي بالظبط من غير أي تعديل.
+
+    can الإضافات الجديدة هنا:
+   1) سجل "آخر عمليات التحليل": بيحفظ آخر 10 فيديوهات اتحللت في
+      localStorage بتاع المتصفح (بيفضل موجود حتى بعد قفل الصفحة)،
+      وبيدي إمكانية إعادة عرض أي فيديو منهم بضغطة واحدة من غير ما
+      تحتاج تلصق الرابط تاني. بيسمع بس لنفس event "yt:videoData"
+      الموجود أصلاً، من غير أي تعديل على analyze().
+   2) تحليل نشاط التعليقات حسب الساعة: عدد التعليقات في كل ساعة من
+      الـ 24 ساعة، أكتر ساعة فيها تعليقات، ورسم بياني (Bar Chart)
+      بالـ CSS بس من غير أي مكتبة خارجية. البيانات بتتجمع من نفس
+      طلبات commentThreads اللي fetchAllTopLevelComments أصلاً
+      بتعملها لبناء الترتيب - صفر طلبات API إضافية، بنفس فكرة اعتراض
+      fetch الموجودة فوق لـ videos/channels (طبقة إضافية جديدة فوق
+      اللي موجودة، من غير ما تلمسها).
+
+   ملحوظة: الساعة المحسوبة هنا هي ساعة جهاز/متصفح اللي بيفتح صفحة
+   التحليل (مش تايم زون المعلق نفسه، لأن يوتيوب مش بيديك تايم زون
+   المعلق - بس تاريخ/وقت UTC للتعليق).
+   ====================================================== */
+
+// ---------- سجل "آخر عمليات التحليل" ----------
+
+const HISTORY_STORAGE_KEY = "ytAnalyzerHistory";
+const HISTORY_MAX_ITEMS = 10;
+
+function loadAnalysisHistory() {
+    try {
+        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveAnalysisHistory(list) {
+    try {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(list.slice(0, HISTORY_MAX_ITEMS)));
+    } catch (e) {}
+}
+
+function addVideoToHistoryList(entry) {
+    let list = loadAnalysisHistory().filter(item => item.id !== entry.id);
+    list.unshift(entry);
+    saveAnalysisHistory(list);
+    renderAnalysisHistoryList();
+}
+
+function clearAnalysisHistory() {
+    try {
+        localStorage.removeItem(HISTORY_STORAGE_KEY);
+    } catch (e) {}
+    renderAnalysisHistoryList();
+}
+
+function renderAnalysisHistoryList() {
+    const section = document.getElementById("historySection");
+    const listBox = document.getElementById("historyList");
+    if (!section || !listBox) return;
+
+    const list = loadAnalysisHistory();
+
+    if (!list.length) {
+        section.style.display = "none";
+        listBox.innerHTML = "";
+        return;
+    }
+
+    listBox.innerHTML = "";
+
+    list.forEach(entry => {
+        const row = document.createElement("div");
+        row.className = "history-item";
+        row.title = "اضغط لإعادة عرض تحليل هذا الفيديو";
+
+        const img = document.createElement("img");
+        img.className = "history-thumb";
+        img.src = entry.thumbnail || "";
+        img.alt = "";
+        img.loading = "lazy";
+
+        const info = document.createElement("div");
+        info.className = "history-info";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "history-title";
+        titleEl.innerText = entry.title || entry.id;
+
+        const metaEl = document.createElement("div");
+        metaEl.className = "history-meta";
+        const metaParts = [];
+        if (entry.channelTitle) metaParts.push(entry.channelTitle);
+        metaParts.push(relativeArabicFromDays(Math.floor((Date.now() - entry.analyzedAt) / 86400000)));
+        metaEl.innerText = metaParts.join(" • ");
+
+        info.appendChild(titleEl);
+        info.appendChild(metaEl);
+
+        row.appendChild(img);
+        row.appendChild(info);
+
+        row.addEventListener("click", () => {
+            const urlInput = document.getElementById("videoUrl");
+            if (urlInput) urlInput.value = "https://www.youtube.com/watch?v=" + entry.id;
+            if (typeof analyze === "function") analyze();
+        });
+
+        listBox.appendChild(row);
+    });
+
+    section.style.display = "block";
+}
+
+(function () {
+    window.addEventListener("yt:videoData", (ev) => {
+        try {
+            const item = ev.detail || {};
+            const snippet = item.snippet || {};
+            if (!item.id) return;
+
+            const thumbs = snippet.thumbnails || {};
+            const thumbUrl = (thumbs.medium || thumbs.default || thumbs.high || {}).url || "";
+
+            addVideoToHistoryList({
+                id: item.id,
+                title: snippet.title || "",
+                channelTitle: snippet.channelTitle || "",
+                thumbnail: thumbUrl,
+                analyzedAt: Date.now()
+            });
+        } catch (e) {}
+    });
+
+    const clearBtn = document.getElementById("clearHistoryBtn");
+    if (clearBtn) {
+        clearBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            clearAnalysisHistory();
+        });
+    }
+
+    renderAnalysisHistoryList();
+})();
+
+// ---------- تحليل نشاط التعليقات حسب الساعة ----------
+
+function formatHourLabel12(hour) {
+    const period = hour < 12 ? "ص" : "م";
+    let h12 = hour % 12;
+    if (h12 === 0) h12 = 12;
+    return h12 + " " + period;
+}
+
+function renderHourlyActivityChart(counts) {
+    const section = document.getElementById("hourlyActivitySection");
+    const statsBox = document.getElementById("hourlyActivityStats");
+    const chartBox = document.getElementById("hourlyChart");
+    if (!section || !statsBox || !chartBox) return;
+
+    const total = counts.reduce((a, b) => a + b, 0);
+    if (total === 0) {
+        section.style.display = "none";
+        return;
+    }
+
+    const max = Math.max(...counts);
+    const peakHour = counts.indexOf(max);
+
+    statsBox.innerHTML = "";
+
+    const stat1 = document.createElement("div");
+    stat1.className = "channel-stat";
+    stat1.innerHTML =
+        '<div class="channel-stat-value">' + formatHourLabel12(peakHour) + '</div>' +
+        '<div class="channel-stat-label">أكتر ساعة فيها تعليقات</div>';
+
+    const stat2 = document.createElement("div");
+    stat2.className = "channel-stat";
+    stat2.innerHTML =
+        '<div class="channel-stat-value">' + max.toLocaleString() + '</div>' +
+        '<div class="channel-stat-label">تعليق في الساعة دي</div>';
+
+    statsBox.appendChild(stat1);
+    statsBox.appendChild(stat2);
+
+    chartBox.innerHTML = "";
+
+    for (let h = 0; h < 24; h++) {
+        const col = document.createElement("div");
+        col.className = "hourly-bar-col";
+
+        const bar = document.createElement("div");
+        bar.className = "hourly-bar";
+        if (h === peakHour && counts[h] > 0) bar.classList.add("hourly-bar-peak");
+
+        const pct = max > 0 ? Math.round((counts[h] / max) * 100) : 0;
+        bar.style.height = pct + "%";
+        bar.title = "الساعة " + formatHourLabel12(h) + " (" + h + ":00) — " + counts[h].toLocaleString() + " تعليق";
+
+        col.appendChild(bar);
+
+        if (h % 3 === 0) {
+            const label = document.createElement("div");
+            label.className = "hourly-bar-label";
+            label.innerText = h;
+            col.appendChild(label);
+        }
+
+        chartBox.appendChild(col);
+    }
+
+    section.style.display = "block";
+}
+
+/* اعتراض إضافي فوق window.fetch (نفس فكرة الاعتراض الموجود فوق لـ
+   videos/channels، بس بيراقب commentThreads بدل كده) عشان يلقط وقت
+   نشر كل تعليق (publishedAt) من نفس ردود الـ API اللي
+   fetchAllTopLevelComments أصلاً بتجيبها - صفر طلبات إضافية. بيتلف
+   فوق أي اعتراض fetch سابق من غير ما يعدل فيه أو في
+   fetchAllTopLevelComments نفسها خالص. */
+(function () {
+    if (typeof window.fetch !== "function") return;
+
+    window.__hourlyCommentCounts = null;
+    window.__hourlyPagePromises = [];
+
+    const fetchBeforeHourlyLayer = window.fetch;
+
+    window.fetch = function (...args) {
+        const promise = fetchBeforeHourlyLayer.apply(this, args);
+
+        try {
+            const target = args[0];
+            const urlStr = typeof target === "string" ? target : (target && target.url) || "";
+
+            if (urlStr.indexOf("youtube/v3/commentThreads") !== -1) {
+                const pagePromise = promise
+                    .then(res => res.clone().json())
+                    .then(data => {
+                        if (!window.__hourlyCommentCounts) return;
+                        if (data && !data.error && data.items) {
+                            data.items.forEach(item => {
+                                try {
+                                    const iso = item.snippet.topLevelComment.snippet.publishedAt;
+                                    const d = new Date(iso);
+                                    if (!isNaN(d.getTime())) {
+                                        window.__hourlyCommentCounts[d.getHours()]++;
+                                    }
+                                } catch (e) {}
+                            });
+                        }
+                    })
+                    .catch(() => {});
+
+                window.__hourlyPagePromises.push(pagePromise);
+            }
+        } catch (e) {}
+
+        return promise;
+    };
+})();
+
+/* بتصفر عداد الساعات مع كل تحليل جديد وترسم الرسم البياني بعد ما كل
+   صفحات التعليقات تخلص تحميل تماماً (بتستنى __hourlyPagePromises
+   عشان صفحة التعليقات الأخيرة ميبقاش لسه بيتحسب وقت الرسم). بتلف
+   فوق fetchTopComments زي باقي الطبقات فوق - من غير أي تعديل في
+   جسمها ولا في fetchAllTopLevelComments ولا buildCommenterRanking. */
+(function () {
+    if (typeof window.fetchTopComments !== "function") return;
+    const fetchTopCommentsBeforeHourlyWrap = window.fetchTopComments;
+
+    window.fetchTopComments = async function (videoId) {
+        window.__hourlyCommentCounts = new Array(24).fill(0);
+        window.__hourlyPagePromises = [];
+
+        const section = document.getElementById("hourlyActivitySection");
+        if (section) section.style.display = "none";
+
+        const result = await fetchTopCommentsBeforeHourlyWrap.apply(this, arguments);
+
+        try {
+            await Promise.all(window.__hourlyPagePromises);
+            renderHourlyActivityChart(window.__hourlyCommentCounts);
+        } catch (e) {}
+
+        return result;
+    };
+})();
+
+// ---------- أعلى كومنت جاب لايكات ----------
+
+function renderTopLikedComments(comments) {
+    const section = document.getElementById("topLikedCommentsSection");
+    const listBox = document.getElementById("topLikedCommentsList");
+    if (!section || !listBox) return;
+
+    if (!comments || comments.length === 0) {
+        section.style.display = "none";
+        listBox.innerHTML = "";
+        return;
+    }
+
+    const sorted = comments.slice().sort((a, b) => b.likeCount - a.likeCount);
+    const topLiked = sorted.slice(0, 10);
+
+    listBox.innerHTML = "";
+
+    topLiked.forEach((c, index) => {
+        const div = document.createElement("div");
+        div.className = "comment-item";
+
+        const rankEl = document.createElement("div");
+        rankEl.className = "comment-rank";
+        rankEl.innerText = index + 1;
+
+        const bodyEl = document.createElement("div");
+        bodyEl.className = "comment-body";
+
+        const authorEl = document.createElement("div");
+        authorEl.className = "comment-author";
+        authorEl.innerHTML = c.authorUrl
+            ? `<a href="${c.authorUrl}" target="_blank">${escapeHtml(c.author)}</a>`
+            : escapeHtml(c.author);
+
+        const textEl = document.createElement("div");
+        textEl.className = "comment-text";
+        const shortText = c.text.length > 300 ? c.text.slice(0, 300) + "…" : c.text;
+        textEl.innerText = shortText;
+
+        const likesEl = document.createElement("div");
+        likesEl.className = "comment-likes";
+        likesEl.innerText = "👍 " + c.likeCount.toLocaleString() + " لايك" + (index === 0 ? " 🏆" : "");
+
+        bodyEl.appendChild(authorEl);
+        bodyEl.appendChild(textEl);
+        bodyEl.appendChild(likesEl);
+
+        div.appendChild(rankEl);
+        div.appendChild(bodyEl);
+
+        listBox.appendChild(div);
+    });
+
+    section.style.display = "block";
+}
+
+/* اعتراض إضافي فوق window.fetch (بنفس فكرة الاعتراض الموجود فوق
+   لتحليل نشاط التعليقات حسب الساعة) عشان يلقط لكل تعليق: نص الكومنت
+   وصاحبه ورابط قناته وعدد اللايكات اللي جابها - كل ده من نفس ردود
+   commentThreads API اللي fetchAllTopLevelComments أصلاً بتجيبها
+   لبناء ترتيب المعلقين، يعني صفر طلبات إضافية على الـ quota. بيتلف
+   فوق أي اعتراض fetch سابق من غير ما يعدل فيه أو في
+   fetchAllTopLevelComments نفسها خالص. */
+(function () {
+    if (typeof window.fetch !== "function") return;
+
+    window.__topLikedComments = [];
+    window.__topLikedPagePromises = [];
+
+    const fetchBeforeTopLikedLayer = window.fetch;
+
+    window.fetch = function (...args) {
+        const promise = fetchBeforeTopLikedLayer.apply(this, args);
+
+        try {
+            const target = args[0];
+            const urlStr = typeof target === "string" ? target : (target && target.url) || "";
+
+            if (urlStr.indexOf("youtube/v3/commentThreads") !== -1) {
+                const pagePromise = promise
+                    .then(res => res.clone().json())
+                    .then(data => {
+                        if (!window.__topLikedComments) return;
+                        if (data && !data.error && data.items) {
+                            data.items.forEach(item => {
+                                try {
+                                    const c = item.snippet.topLevelComment.snippet;
+                                    window.__topLikedComments.push({
+                                        author: c.authorDisplayName,
+                                        authorUrl: c.authorChannelUrl || null,
+                                        text: c.textOriginal || c.textDisplay || "",
+                                        likeCount: Number(c.likeCount) || 0
+                                    });
+                                } catch (e) {}
+                            });
+                        }
+                    })
+                    .catch(() => {});
+
+                window.__topLikedPagePromises.push(pagePromise);
+            }
+        } catch (e) {}
+
+        return promise;
+    };
+})();
+
+/* بتصفر قائمة "أعلى كومنت جاب لايكات" مع كل تحليل جديد وترسمها بعد
+   ما كل صفحات التعليقات تخلص تحميل تماماً (بتستنى
+   __topLikedPagePromises عشان صفحة التعليقات الأخيرة ميبقاش لسه
+   بيتحسب وقت الرسم) - بنفس فكرة تحليل نشاط التعليقات حسب الساعة
+   فوق. بتلف فوق fetchTopComments زي باقي الطبقات - من غير أي تعديل
+   في جسمها ولا في fetchAllTopLevelComments ولا buildCommenterRanking. */
+(function () {
+    if (typeof window.fetchTopComments !== "function") return;
+    const fetchTopCommentsBeforeTopLikedWrap = window.fetchTopComments;
+
+    window.fetchTopComments = async function (videoId) {
+        window.__topLikedComments = [];
+        window.__topLikedPagePromises = [];
+
+        const section = document.getElementById("topLikedCommentsSection");
+        if (section) section.style.display = "none";
+
+        const result = await fetchTopCommentsBeforeTopLikedWrap.apply(this, arguments);
+
+        try {
+            await Promise.all(window.__topLikedPagePromises);
+            renderTopLikedComments(window.__topLikedComments);
+        } catch (e) {}
+
+        return result;
+    };
+})();
+
+/* ======================================================
+   إغلاق نافذة الترحيب وإخفاء تأثير البلور (مرحلة أحدث):
+   وظيفة مغلفة تماماً لمنع حدوث تداخل أو مساس بالدوال السابقة.
+   ====================================================== */
+(function () {
+    const overlay = document.getElementById("welcomeOverlay");
+    const btn = document.getElementById("closeWelcomeBtn");
+    if (overlay && btn) {
+        btn.addEventListener("click", () => {
+            overlay.style.opacity = "0";
+            overlay.style.visibility = "hidden";
+            setTimeout(() => {
+                overlay.remove(); 
+            }, 400);
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
